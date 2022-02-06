@@ -1,91 +1,63 @@
-# CartoonGAN-Test-Pytorch-Torch
-Pytorch and Torch testing code of [CartoonGAN](http://openaccess.thecvf.com/content_cvpr_2018/CameraReady/2205.pdf) `[Chen et al., CVPR18]`. With the released pretrained [models](http://cg.cs.tsinghua.edu.cn/people/~Yongjin/Yongjin.htm) by the authors, I made these simple scripts for a quick test.
+# Video2Cartoon
+
+Create cartoon versions of your videos (and images) using CartoonGAN and OpenCV. The code is based on the CartoonGAN <a href="https://openaccess.thecvf.com/content_cvpr_2018/CameraReady/2205.pdf" rel="nofollow">paper</a> of Chen et al. and the PyTorch <a href="https://github.com/Yijunmaverick/CartoonGAN-Test-Pytorch-Torch" rel="nofollow">implementation</a> of Yijun Li.
+
+The following still frame shows the original video on the left and the Hayao style cartoon version on the right. The corresponding video showcasing all 4 cartoon styles (Hayao, Shinkai, Hosoda, Paprika) is available in ```media/marathon.mp4```. The original video can be downloaded from <a href="https://pixabay.com/videos/marathon-marathon-runners-running-15741/" rel="nofollow">here</a>.
 
 <p>
-    <img src='test_output/demo_ori.gif' width=300 />
-    <img src='test_output/demo.gif' width=300 />
+    <img src='media/marathon_still.jpg' alt='Original video (left) and Hayao style cartoon (right)'>
 </p>
 
+## Requirements
 
-## Getting started
+- Python 3
+- PyTorch
+- OpenCV
+- Numpy
 
-- Linux
-- NVIDIA GPU
-- Pytorch 0.3
-- Torch
+This code has been tested with Python 3.8, PyTorch 1.9.0, OpenCV 4.5.5.62 and Numpy 1.19.2. You also need to have the chosen codec installed in your system in order to produce videos. The default codec is DIVX, but you can specify any other codec using the ```--video_codec``` parameter.
+
+## How to run
+
+Download the code and open a terminal / command prompt inside the Video2Cartoon directory. Run:
+```
+python video2cartoon.py -h
+```
+to familiarize yourself with all the available options and make the most out of this code. The most important options are:
+
+- ```--style``` which determines the cartoon style to use. Available options are Hayao, Shinkai, Hosoda and Paprika. The first time you run each style, the code automatically downloads the corresponding network weights and places them inside the ```model_weights``` directory, which is created if not present.
+- ```--reduce_ratio``` which allows resizing the input. This is particularly useful if your system runs out of memory when processing the input.
+- ```--video_codec``` which determines the codec to use when creating videos.
+
+To execute the program on an input video, reduce its width and height by half and use the Hosoda style, simply run:
 
 ```
-git clone https://github.com/Yijunmaverick/CartoonGAN-Test-Pytorch-Torch
-cd CartoonGAN-Test-Pytorch-Torch
+python video2cartoon.py path_to_video --style Hosoda --reduce_ratio 0.5
 ```
 
-## Pytorch
-
-The original pretrained models are Torch `nngraph` models, which cannot be loaded in Pytorch through `load_lua`. So I manually copy the weights (bias) layer by layer and convert them to `.pth` models. 
-
-- Download the converted models:
+The new video will have the same fps as the original. To execute the program on an image, the process is exactly the same:
 
 ```
-sh pretrained_model/download_pth.sh
+python video2cartoon.py path_to_image
 ```
 
-- For testing:
+You don't need to have a modern GPU to run the program, but it is recommended when processing videos. The code automatically detects if a suitable GPU is present in order to speed up the computations. If not, all computations take place in the CPU / system RAM.
 
-```
-python test.py --input_dir YourImgDir --style Hosoda --gpu 0
-```
+## Results
 
-## Torch
-
-Working with the original models in Torch is also fine. I just convert the weights (bias) in their models from CudaTensor to FloatTensor so that `cudnn` is not required for loading models.
-
-- Download the converted models:
-
-```
-sh pretrained_model/download_t7.sh
-```
-
-- For testing:
-
-```
-th test.lua -input_dir YourImgDir -style Hosoda -gpu 0
-```
-
-## Examples (Left: input, Right: output)
+Below is a still frame from ```media/India.mp4``` showing the original video on the left and the Paprika style cartoon on the right. The original video can be downloaded from <a href="https://pixabay.com/videos/india-street-busy-rickshaw-people-3175/" rel="nofollow">here</a>.
 
 <p>
-    <img src='test_img/in2.png' width=300 />
-    <img src='test_output/in2_Hayao.png' width=300 />
+    <img src='media/India_still.jpg' alt='Original video (left) and Paprika style cartoon (right)'>
 </p>
+
+The following compositions (available in ```media/lake_comp.jpg``` and ```media/woman_comp.jpg```) show the original image on the top left, the Hayao and Hosoda styles on the top center and top right, and the Shinkai and Paprika styles on the bottom left and bottom right. The original images can be downloaded from <a href="https://pixabay.com/photos/lake-fog-mountains-tourism-travel-6975332/" rel="nofollow">here</a> and <a href="https://pixabay.com/photos/woman-swim-model-swimsuit-6361651/" rel="nofollow">here</a>.
 
 <p>
-    <img src='test_img/in3.png' width=300 />
-    <img src='test_output/in3_Hayao.png' width=300 />
+    <img src='media/lake_comp.jpg' alt='Original image on the top left, the Hayao and Hosoda styles on the top center and top right, and the Shinkai and Paprika styles on the bottom left and bottom right'>
+    <img src='media/woman_comp.jpg' alt='Original image on the top left, the Hayao and Hosoda styles on the top center and top right, and the Shinkai and Paprika styles on the bottom left and bottom right'>
 </p>
 
-<p>
-    <img src='test_img/5--26.jpg' width=300 />
-    <img src='test_output/5--26_Hosoda.jpg' width=300 />
-</p>
+## License
 
-<p>
-    <img src='test_img/7--136.jpg' width=300 />
-    <img src='test_output/7--136_Hayao.jpg' width=300 />
-</p>
-
-<p>
-    <img src='test_img/15--324.jpg' width=300 />
-    <img src='test_output/15--324_Hosoda.jpg' width=300 />
-</p>
-
-
-## Note
-
-- The training code should be similar to the popular GAN-based image-translation frameworks and thus is not included here.
-
-## Acknowledgement
-
-- Many thanks to the authors for this cool work.
-
-- Part of the codes are borrowed from [DCGAN](https://github.com/soumith/dcgan.torch), [TextureNet](https://github.com/DmitryUlyanov/texture_nets), [AdaIN](https://github.com/xunhuang1995/AdaIN-style) and [CycleGAN](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix).
-
+This work, as well as the original work by Yijun Li, is under the MIT License.
