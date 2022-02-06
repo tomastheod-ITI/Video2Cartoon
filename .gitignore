@@ -1,4 +1,3 @@
-media/*
 model_weights/*.pth
 output/*
 *.pyc
